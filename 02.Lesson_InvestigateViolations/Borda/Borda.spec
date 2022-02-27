@@ -48,7 +48,9 @@ rule onceBlackListedNotOut(method f, address voter){
     f(e, args);
     bool registeredAfter; bool black_listed_After;
     age, registeredAfter, voted, vote_attempts, black_listed_After = getFullVoterDetails(e, voter);
-    
+
+    // NOTE: Q: Why should we care about whether it is registered before?
+    //  E.g. Can we just do `assert (black_listed_Before) => black_listed_After)`?
     assert (registeredBefore && black_listed_Before) => black_listed_After, "the specified user got out of the black list";
 }
 

@@ -84,14 +84,15 @@ contract Borda is IBorda {
                 _blackList.push(msg.sender); 
                 _voters[msg.sender].black_listed = true;
            }
+           // FIXME: It looks like `black_listed` will never be set since it is always reverted.
            assert(false);
         }
 
         _voters[msg.sender].voted = true;
         voteTo(first, 3);
-        voteTo(second, 3);
-        voteTo(third, 3);
-        
+        voteTo(second, 2);  //@note points to the second is 3, when it should've been 2.
+        voteTo(third, 1);  //@note points to the third is 3, when it should've been 1.
+
         return true;
     }
 
