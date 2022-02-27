@@ -32,17 +32,15 @@ rule startBeforeEnd(method f, uint256 meetingId, uint256 startTime, uint256 endT
 }
 
 
-// Checks that a meeting can only be started within the the defined range [startTime, endTime]
+// Checks that a meeting can only be started within the the defined range [startTime, endTime)
 rule startOnTime(method f, uint256 meetingId) {
 	env e;
 	calldataarg args;
 	uint8 stateBefore = getStateById(e, meetingId);
 	f(e, args); // call only non reverting paths to any function on any arguments.
 	uint8 stateAfter = getStateById(e, meetingId);
-    
 	assert (stateBefore == 1 && stateAfter == 2) => getStartTimeById(e, meetingId) <= e.block.timestamp, "started a meeting before the designated starting time.";
 	assert (stateBefore == 1 && stateAfter == 2) => getEndTimeById(e, meetingId) > e.block.timestamp, "started a meeting after the designated end time.";
-	
 }
 
 
