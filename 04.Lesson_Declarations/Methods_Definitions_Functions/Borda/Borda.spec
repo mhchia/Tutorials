@@ -6,16 +6,22 @@ methods{
     getFullContenderDetails(address) returns(uint8, bool, uint256) envfree
 }
 
+// Write CVL functions in Borda Election that takes a voter as argument and retrieves just one element from the struct, i.e. age, registered, voted, etc.
+
+function getVoterReg(address voter) returns bool {
+    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    return voterReg;
+}
+
 // Checks that a voter's "registered" mark is changed correctly -
 // If it's false after a function call, it was false before
 // If it's true after a function call, it either started as true or changed from false to true via registerVoter()
 rule registeredCannotChangeOnceSet(method f, address voter){
     env e; calldataarg args;
-    uint256 age; bool voterRegBefore; bool voted; uint256 vote_attempts; bool blocked;
-    age, voterRegBefore, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    bool voterRegBefore = getVoterReg(voter);
     f(e, args);
-    bool voterRegAfter;
-    age, voterRegAfter, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    bool voterRegAfter = getVoterReg(voter);
 
     assert (!voterRegAfter => !voterRegBefore, "voter changed state from registered to not registered after a function call");
     assert (voterRegAfter =>
