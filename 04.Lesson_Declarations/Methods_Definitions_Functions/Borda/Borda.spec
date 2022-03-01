@@ -6,13 +6,35 @@ methods{
     getFullContenderDetails(address) returns(uint8, bool, uint256) envfree
 }
 
-// Write CVL functions in Borda Election that takes a voter as argument and retrieves just one element from the struct, i.e. age, registered, voted, etc.
 
 function getVoterReg(address voter) returns bool {
     uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
     age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
     return voterReg;
 }
+
+function getVoterVoted(address voter) returns bool {
+    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    return voted;
+}
+
+function getVoterBlocked(address voter) returns bool {
+    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    return blocked;
+}
+
+
+// unRegisteredVoter - for a voter that isn't registered at all.
+// registeredYetVotedVoter - for a registered voter that hasn't voted yet.
+// legitRegisteredVotedVoter - for a registered voter that has voted but isn't blocked.
+// blockedVoter - for a registered voter that has voted, and is blocked.
+definition unRegisteredVoter(address voter) returns bool = !getVoterReg(voter);
+definition registeredYetVotedVoter(address voter) returns bool = getVoterReg(voter) && !getVoterVoted(voter);
+definition legitRegisteredVotedVoter(address voter) returns bool = getVoterReg(voter) && getVoterVoted(voter) && !getVoterBlocked(voter);
+definition blockedVoter(address voter) returns bool = getVoterReg(voter) && getVoterVoted(voter) && getVoterBlocked(voter);
+
 
 // Checks that a voter's "registered" mark is changed correctly -
 // If it's false after a function call, it was false before

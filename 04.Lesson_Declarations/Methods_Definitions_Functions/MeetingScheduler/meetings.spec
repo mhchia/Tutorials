@@ -6,6 +6,13 @@ methods {
 	getOrganizer(uint256) returns (address) envfree
 }
 
+// Meeting status in MeetingScheduler
+definition UNINITIALIZED() returns uint8 = 0;
+definition PENDING() returns uint8 = 1;
+definition STARTED() returns uint8 = 2;
+definition ENDED() returns uint8 = 3;
+definition CANCELLED() returns uint8 = 4;
+
 /*  Representing enums
 
     enums are supported by the Certora Verification Language (CVL),
