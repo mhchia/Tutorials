@@ -1,0 +1,39 @@
+System
+- Unit-tests
+    - mint
+        - userBalanceAfter - userBalanceBefore == amount
+        - totalSupplyAfter - totalSupplyBefore == amount
+    - transferTo
+        - msgSenderBalanceBefore + toBalanceBefore == msgSenderBalanceAfter + toBalanceAfter
+    - newAuction
+        - `auctions[id]` is created and non-zero
+    - bid
+        - prizeBefore > prizeAfter
+        - newWinnerBalanceBefore + oldWinnerBalanceBefore == newWinnerBalanceAfter + oldWinnerBalanceAfter
+            - since the new winner must *buy off* the payment of the old winner.
+        - bid_expiryBefore < bid_expiryAfter
+        - New winner
+    - close
+        - New winner get the prize
+- Valid States
+    - UNSTARTED (end_time == 0)
+    - STARTED (end_time != 0)
+    - CLOSABLE (bid_expiry != 0 && (auctions[id].bid_expiry < now || auctions[id].end_time < now))
+    - Rule: one state at a time
+- State Transitions
+    - INITIAL -> STARTED
+        - This can only be achieved by `newAuction`.
+    - STARTED -> CLOSABLE
+        - This can happen when `end_time` or `bid_expiry` is due.
+    - CLOSABLE -> STARTED
+        - This can only be achieved by `bid`.
+    - CLOSABLE -> INITIAL
+        - This can only be achieved by `close`.
+- Variable Transitions
+    - totalSupply can only be increased.
+    - auctions[id].prize can only be decreased otherwise becomes zero.
+    - auctions[id].bid_expiry can only be increased otherwise becomes zero.
+    - auctions[id].payment stays the same after all operations, otherwise becomes zero.
+- High-level
+    - General
+        - totalSupply >= balances[user]
