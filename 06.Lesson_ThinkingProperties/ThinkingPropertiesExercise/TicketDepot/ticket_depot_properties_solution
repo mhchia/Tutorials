@@ -1,0 +1,32 @@
+# Meeting
+## Rules
+### Valid State
+1. (state = eventYetCreated) => all fields in Event shall be empty.
+
+### State Transitions
+2. (eventsMap[id].owner, eventsMap[id].ticketPrice, and eventsMap[id].ticketsRemaining are set) => (f.selector = createEvent(uint64, uint16))
+
+### Variable Transitions
+3. (state = eventCreated) => ticketsRemaining is non-increasing
+4. (eventsMap[_eventID].attendees[_ticketID] before != 0 && eventsMap[_eventID].attendees[_ticketID] before != eventsMap[_eventID].attendees[_ticketID] after) => (f.selector = buyOfferedTicket(uint16, uint16, address))
+5. (offerings[offerID].deadline before == 0 && offerings[offerID].deadline after) after != 0) => (f.selector = offerTicket(uint16, uint16, uint64, address, uint16))
+
+### High-Level Properties
+6. numEvents is always non-decreasing
+7. ticketsRemaining is less than 65535 (type(uint16).max).
+
+### Unit Tests
+8. States are modified correctly after `buyNewTicket`, `offerTicket`, or `buyOfferedTicket`.
+
+## Priority
+### High
+- Rule 1: event fields must be empty to make the system correct.
+- Rule 2: event data can be only modified when `createEvent`, otherwise data is changed elsewhere and possibly earned fees are sent to non-owner.
+- Rule 6: numEvents integrity guarantees the profit of owner
+
+### Medium
+- Rule 3, 7: integrity of ticketsRemaining ensure tickets are allocated in a correct order.
+- Rule 4, 5: offerings and attendees integrity guarantees tickets ownership.
+
+### Low
+- Rule 8: because they can be easily verified either by other means or manual check.

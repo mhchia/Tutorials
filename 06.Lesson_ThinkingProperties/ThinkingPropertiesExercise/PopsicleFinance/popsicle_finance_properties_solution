@@ -1,0 +1,33 @@
+# Meeting
+## Rules
+### Valid State
+1. stateNoUser => all balances and accounts should be empty.
+
+### State Transitions
+2. (userBalanceBefore = 0 and userBalanceAfter > 0) => ((f.selector = deposit(uint256)) or (f.selector == transferFrom(address, address, uint256)) or (f.selector == transfer(address, uint256)))
+
+### Variable Transitions
+3. After every call f(env, args), totalFeesEarnedPerShareBefore <= totalFeesEarnedPerShareAfter. It's because totalFeesEarnedPerShare should be increased over time.
+
+### High-Level Properties
+4. ERC20: totalSupply() = balanceOf(user) for all user in users
+5. assetsOf(user) shall be only non-decreasing if user hasn't transfer/transferFrom/withdraw
+6. totalFeesEarnedPerShareAfter increased => owner has send fees to the contract.
+
+### Unit Tests
+7. After `deposit`, the ether balance of the contract shall be increased and the deposit information of the caller shall be saved correctly.
+8. `OwnerDoItsJobAndEarnsFeesToItsClients` shall only be called by owner.
+
+## Priority
+### High
+- Rule 1: if it's not empty at first, the system will be wrong.
+- Rule 2: user balance shall be increased only in the ways we are aware of. If a user can increase its balance by some other approach, the funds of other users are at risk.
+- Rule 4: balance shall be calculated correctly otherwise all calculations are possibly affected and wrong.
+- Rule 3, 5, 6: fees are fed correctly and user can indeed earn fees. They are medium instead of high because even if
+
+### Medium
+
+
+### Low
+- Rule 7, 8: can be easily tested by other ways.
+

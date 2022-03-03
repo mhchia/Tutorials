@@ -1,0 +1,29 @@
+# Meeting
+## Rules
+### Valid State
+1. (state = UNINITIALIZED) => all fields in ScheduledMeeting shall be empty.
+
+### State Transitions
+2. (beforeState = PENDING and afterState = STARTED) => f.selector = startMeeting(uint256)
+
+### Variable Transitions
+3. ScheduledMeeting.organizer can only be set when transiting from UNINITIALIZED and possibly unset when transiting to END or CANCELLED.
+
+### High-Level Properties
+4. For a meeting, except for its termination (either cancelled by owner or ended), startTime and endTime must not be changed by non-owner.
+
+### Unit Tests
+5. After joinMeeting is called, numOfParticipants is increased by 1.
+
+## Priority
+### High
+- Rule 2: if a meeting can be started by methods other than startMeeting, the meeting owner might fail to manage the life time of the meeting properly.
+- Rule 3: If the organizer can be changed unexpectedly the meeting owner will not be able to manage the meeting properly.
+- Rule 4: if startTime and endTime can be changed by a non-owner, the meeting might be ended up unexpectedly (possibly DoSed).
+
+### Medium
+- Rule 1: even though it's undesired and error-prone if a meeting has non-empty value at start, the field can be overridden after initialization.
+
+### Low
+- Rule 5: because it can be easily verified either by other means or manual check.
+
