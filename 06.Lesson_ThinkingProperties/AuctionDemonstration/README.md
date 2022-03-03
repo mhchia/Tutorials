@@ -7,7 +7,7 @@ You can read about the catch in the following [blog post](https://blog.makerdao.
 
 
 - [ ] Look at the contract [Auction Fixed](AuctionFixed.sol) in this directory created by Maker. Try to understand what the contracts do and how they operate in a high-level sense.
-    
+
 </br>
 
 - [ ] Try to think about as many properties as you can for the contract. Write them down in your favorite word processor and upload them in a file named "auction_properties_solution" to the current directory.
@@ -35,6 +35,23 @@ You can read about the catch in the following [blog post](https://blog.makerdao.
 - [ ] Run the script [runBroken.sh](runBroken.sh) and get a violation. Investigate the reason for the fail and see that you understand it.
 
 - [ ] Try to suggest a solution that will mitigate the wrongful behavior.
+> I just make sure `totalSupply < type(uint256).max` after a `close`. I do it by
+```
+	function close(uint id)  public {
+		require(auctions[id].bid_expiry != 0
+				&& (auctions[id].bid_expiry < now ||
+					auctions[id].end_time < now));
+		uint totalSupplyBeforeMint = getTotalSupply();
+		uint totalSupplyAfterMint = auctions[id].prize.safeAdd(totalSupplyBeforeMint);
+		// `totalSupplyAfterMint` must be less than `type(uint256).MAX` for the rule `boundedSupply` to hold,
+        // by checking it does not wrap around after adding 1.
+		require(totalSupplyAfterMint + 1 > totalSupplyBeforeMint);
+		mint(auctions[id].winner, auctions[id].prize);
+		delete auctions[id];
+	}
+```
 
 - [ ] Compare the 2 contracts - [Auction Broken](AuctionBroken.sol) and [Auction Fixed](AuctionFixed.sol) to find the fix. Run the script [runFixed.sh](runFixed.sh) and see that it is indeed solving the problem.
 Were you thinking of the same solution or did you think of another one? There could be more than 1 correct answer.
+
+> My solution is not the same, but they are quite similar: don't let `totalSupply` be `type(uint256).max` after `close`.
