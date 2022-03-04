@@ -4,7 +4,7 @@
 1. (state = eventYetCreated) => all fields in Event shall be empty.
 
 ### State Transitions
-2. (eventsMap[id].owner, eventsMap[id].ticketPrice, and eventsMap[id].ticketsRemaining are set) => (f.selector = createEvent(uint64, uint16))
+2. event is created => (f.selector = createEvent(uint64, uint16))
 
 ### Variable Transitions
 3. (state = eventCreated) => ticketsRemaining is non-increasing
