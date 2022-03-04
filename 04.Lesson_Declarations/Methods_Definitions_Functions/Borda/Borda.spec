@@ -4,23 +4,32 @@ methods{
     getWinner() returns(address, uint256) envfree
     getFullVoterDetails(address) returns(uint8, bool, bool, uint256, bool) envfree
     getFullContenderDetails(address) returns(uint8, bool, uint256) envfree
+    registerVoter(uint8) returns (bool);
+    registerContender(uint8) returns (bool);
+    vote(address, address, address) returns (bool);
 }
 
 
 function getVoterReg(address voter) returns bool {
-    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    uint8 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
     age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
     return voterReg;
 }
 
 function getVoterVoted(address voter) returns bool {
-    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    uint8 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
     age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
     return voted;
 }
 
+function getVoterVoteAttempts(address voter) returns uint256 {
+    uint8 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
+    return vote_attempts;
+}
+
 function getVoterBlocked(address voter) returns bool {
-    uint256 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
+    uint8 age; bool voterReg; bool voted; uint256 vote_attempts; bool blocked;
     age, voterReg, voted, vote_attempts, blocked = getFullVoterDetails(voter);
     return blocked;
 }
@@ -72,7 +81,7 @@ rule correctPointsIncreaseToContenders(address first, address second, address th
 // Checks that a blocked voter cannot get unlisted
 rule onceBlockedNotOut(method f, address voter){
     env e; calldataarg args;
-    uint256 age; bool registeredBefore; bool voted; uint256 vote_attempts; bool blocked_before;
+    uint8 age; bool registeredBefore; bool voted; uint256 vote_attempts; bool blocked_before;
     age, registeredBefore, voted, vote_attempts, blocked_before = getFullVoterDetails(voter);
     require blocked_before => registeredBefore;
     f(e, args);
