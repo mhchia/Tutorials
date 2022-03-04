@@ -42,6 +42,14 @@ contract MeetingScheduler is IMeetingScheduler {
         return meetings[meetingId].numOfParticipents;
     }
 
+    function getOrganizer(uint256 meetingId)
+        external
+        view
+        returns (address)
+    {
+        return meetings[meetingId].organizer;
+    }
+
     function scheduleMeeting(
         uint256 meetingId,
         uint256 startTime,

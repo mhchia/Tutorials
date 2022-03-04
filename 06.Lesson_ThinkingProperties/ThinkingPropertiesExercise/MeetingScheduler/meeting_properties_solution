@@ -7,10 +7,10 @@
 2. (beforeState = PENDING and afterState = STARTED) => f.selector = startMeeting(uint256)
 
 ### Variable Transitions
-3. ScheduledMeeting.organizer can only be set when transiting from UNINITIALIZED and possibly unset when transiting to END or CANCELLED.
+3. ScheduledMeeting.organizer can only be set by scheduleMeeting.
 
 ### High-Level Properties
-4. For a meeting, except for its termination (either cancelled by owner or ended), startTime and endTime must not be changed by non-owner.
+4. For a meeting, except for scheduleMeeting, startTime and endTime must not be changed.
 
 ### Unit Tests
 5. After joinMeeting is called, numOfParticipants is increased by 1.
