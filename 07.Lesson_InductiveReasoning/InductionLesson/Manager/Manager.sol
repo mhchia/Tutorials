@@ -11,10 +11,10 @@ contract Manager {
 	}
 
 	// Maps a fundId to its struct
-	mapping (uint256 => ManagedFund) public funds; 
+	mapping (uint256 => ManagedFund) public funds;
 
 	// A flag indicating if an address is a current manager
-	mapping (address => bool) public isActiveManager; 
+	mapping (address => bool) public isActiveManager;
 
 
 	function createFund(uint256 fundId) public {
@@ -37,7 +37,8 @@ contract Manager {
 		require(funds[fundId].pendingManager == msg.sender);
 		require(!isActiveManager[msg.sender]);
 		isActiveManager[funds[fundId].currentManager] = false;
-		funds[fundId].currentManager = msg.sender;
+		// @note set currentManager to an arbitrary address, to fail the spec.
+		funds[fundId].currentManager = 0x1111111111111111111111111111111111111111;
 		funds[fundId].pendingManager = address(0);
 		isActiveManager[msg.sender] = true;
 	}

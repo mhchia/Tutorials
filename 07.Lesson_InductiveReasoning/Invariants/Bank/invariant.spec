@@ -11,6 +11,11 @@ rule can_withdraw() {
     uint256 reserves       = getEthBalance(currentContract);
     uint256 funds_before   = getFunds(e.msg.sender);
 
+    // NOTE:
+    //  Q: Why we should consider the case which reverts?
+    //  A: Because we believe the invariant that "balance never goes to low".
+    // The @withrevert annotation on the call to withdraw tells the prover to consider cases when withdraw reverts;
+    // the default behavior is to ignore counterexamples that cause reverts
     withdraw@withrevert(e);
 
     uint256 balance_after  = getEthBalance(e.msg.sender);
@@ -24,6 +29,7 @@ invariant totalFunds_GE_single_user_funds()
 
 /* A declaration of a ghost.
  * A ghost is, in esssence, an uninterpeted function (remember lesson 3?).
+ * See cheatsheet section "Uninterpreted functions and constants".
  * This ghost takes no arguments and returns a type mathint.
  */
 ghost sum_of_all_funds() returns uint256{
@@ -45,4 +51,13 @@ hook Sstore funds[KEY address user] uint256 new_balance
 }
 
 invariant totalFunds_GE_to_sum_of_all_funds()
-    getTotalFunds() >= sum_of_all_funds()
+    // NOTE: Nothing changed after changing the inequality. Why?
+    /*
+    Answer: The prover starts with an arbitrary initial state,
+        and take a step from there with one of the functions specified in the contract.
+        Transferring ETH to/from outside the contract is possible in reality,
+        but isn't considered by the Prover since no such function is implemented in the verification context.
+        In other words, the prover tries to abuse the functions it has in hand,
+        and cannot predict malicious actions of functions that aren't explicitly specified to it (re-entrancy for example is tough to predict).
+    */
+    getTotalFunds() == sum_of_all_funds()
