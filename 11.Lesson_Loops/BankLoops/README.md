@@ -4,9 +4,13 @@ In this directory you will find the fixed bank implementation from lesson 1, wit
 
 > :warning: We still haven't encountered ghosts, but don't be intimidated by them, ghost are your friends! We will learn about ghost in [Lesson 13](../../13.Lesson_Ghost). In the meanwhile read the comments on them.
 
-- [ ] Run the rules with no loops-handling flags and see the results. Are all failures occur because on functions that should fail the asserts?
+- [x] Run the rules with no loops-handling flags and see the results. Are all failures occur because on functions that should fail the asserts?
 
-- [ ] add the appropriate flags to pass the rules that should pass un-vacuously and get a proper counter example for scenarios that should fail for a logical reason. Use an `assert false` at the end of the rule to double check that your rule doesn't pass vacuously.
+> No, some `multiTransfer` and `multiTransferWithBug` show "Unwinding condition in a loop" with failure.
+
+- [x] add the appropriate flags to pass the rules that should pass un-vacuously and get a proper counter example for scenarios that should fail for a logical reason. Use an `assert false` at the end of the rule to double check that your rule doesn't pass vacuously.
+
+> with flags `optimistic_loop` and `loop_iter >= 2`, in `multiTransferWithBug` the bug to be triggered since it requires >= 2 loops for the bug to happen.
 
 <details>
 <summary>Hint:</summary>
