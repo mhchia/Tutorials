@@ -53,7 +53,7 @@ contract ERC20 is IERC20 {
         balances[sender] -= amount;
         balances[recipient] += amount;
         allowance[sender][msg.sender] -=  amount;
-     
+
         return true;
     }
 
