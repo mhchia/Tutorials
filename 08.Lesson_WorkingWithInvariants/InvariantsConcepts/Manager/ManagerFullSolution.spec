@@ -13,13 +13,13 @@ rule uniqueManager(uint256 fundId1, uint256 fundId2, method f) {
     require getCurrentManager(fundId1) != 0 => isActiveManager(getCurrentManager(fundId1));
 	require getCurrentManager(fundId2) != 0 => isActiveManager(getCurrentManager(fundId2));
 	require getCurrentManager(fundId1) != getCurrentManager(fundId2) ;
-				
+
 	env e;
 	if (f.selector == claimManagement(uint256).selector)
 	{
 		uint256 id;
 		require id == fundId1 || id == fundId2;
-		claimManagement(e, id);  
+		claimManagement(e, id);
 	}
 	else {
 		calldataarg args;
@@ -32,5 +32,5 @@ rule uniqueManager(uint256 fundId1, uint256 fundId2, method f) {
 
 
 
-		
-	
+
+

@@ -19,7 +19,7 @@ Or closer to the way it should be implemented:
 
 </br>
 
-![Requires](images/Requires_In_Rule.png) 
+![Requires](images/Requires_In_Rule.png)
 
 </br>
 
@@ -32,7 +32,7 @@ In This example, if `fundId1 == fundId2`, we get a tautology - in the assertion,
 We can think of this kind of pre-condition as a known restriction to the rule's validity rather than an assumption on a valid state of the contract. We essentially say: "This specification shouldn't hold for any two funds, but only for any two ***distinct*** funds". Since the Prover is over-approximating, if we weren't to require this condition, it would've given us the case where `fundId1 == fundId2` as a counter example. </br>
 These sort of assumptions **define** the coverage of the rule and can easily be too strong.</br>
 To avoid strong requiring that leads to under-approximation:
-    
+
     a. Specification should be defined cautiously and with great accuracy. For example, we need to refine our specification of the rule:
 
     > Given any 2 ***distinct*** funds, there should be a distinct manager for each of them.
@@ -43,19 +43,19 @@ To avoid strong requiring that leads to under-approximation:
 
 > :information_source: Frequently, these pre-conditions are local, i.e., relevant to a specific rule(s). Usually, they impose restrictions on internal CVL variables only.
 
-- [ ] Try commenting line 8 out and run a verification on the working implementation to see the counter-example.
+- [x] Try commenting line 8 out and run a verification on the working implementation to see the counter-example.
 
 </br>
 
 2. The `require` in line 9 is a pre-condition that assumes perpetual validity of a state of the contract.
-In this example, we would've missed the bug if the contract could've gotten to the state where `address(0)` is an active manager. 
+In this example, we would've missed the bug if the contract could've gotten to the state where `address(0)` is an active manager.
 </br>
 This is an unsafe use of a pre-condition (`require`), mainly since it is not derived by the rule's specification.. It is not a guideline to the rule that marks the boundaries of the rule's supposed coverage. Instead, it is a necessary condition that must be met for the property to hold.
 This pre-condition is a state that should hold no matter what.  Therefore, it should be proven first in form of another rule/invariant.
 
-- [ ] Search for the introduced bug in the function `createFund()` in [ManagerBug3](Manager/ManagerBug3.sol).
+- [x] Search for the introduced bug in the function `createFund()` in [ManagerBug3](Manager/ManagerBug3.sol).
 
-- [ ] Run the spec with line 9 as in the picture above to see if a violation rises.
+- [x] Run the spec with line 9 as in the picture above to see if a violation rises.
 
 To avoid making mistakes by assuming things that can not be safely assumed, we introduce the simple concept of `requireInvariavt`.
 
@@ -75,7 +75,7 @@ invariant exampleInvariant(uint arg1, address arg2, ...)
 
 rule exampleRule(bytes32 arg1, uint arg2, address arg3, ...){
     requireInvariant exampleInvariant(arg2, arg3);
-    
+
     ...
 
     assert exp2;
@@ -90,7 +90,7 @@ invariant exampleInvariant(uint arg1, address arg2, ...)
 
 rule exampleRule(bytes32 arg1, uint arg2, address arg3, ...){
     require exp;
-    
+
     ...
 
     assert exp2;
@@ -98,13 +98,13 @@ rule exampleRule(bytes32 arg1, uint arg2, address arg3, ...){
 ```
 
 This command allows us to build a more modular code by breaking the specification into rules and invariants that prove exactly one property. As in other programming languages, it is easier to debug and design with shorter and simpler code sections.
-If the invariant passes verification, it can be assumed quite safely in any other context. Therefore, the reserved word also helps us visually distinguish between assumptions that we didn't prove before and those with a mathematical basis.  
+If the invariant passes verification, it can be assumed quite safely in any other context. Therefore, the reserved word also helps us visually distinguish between assumptions that we didn't prove before and those with a mathematical basis.
 
 > :memo: When breaking the code to multiple invariants and rules we can find flaws in the asserts more easily, make violation investigation less tiresome, and allow ourselves to use pre-conditions in a modular and safe way.
 
 > :warning: Note that the code will still assume the invariant where ever it is told to, even if the invariant itself fails. Always make sure that the invariant passes correctly before assuming it.
 
-- [ ] Write the pre-condition in line 9 as an invariant and require this invariant instead of line 9. Run the verification on `ManagerBug3` to see the dissonance of failing the invariant while the rule passes.
+- [x] Write the pre-condition in line 9 as an invariant and require this invariant instead of line 9. Run the verification on `ManagerBug3` to see the dissonance of failing the invariant while the rule passes.
 
 </br>
 
@@ -143,12 +143,12 @@ The general PB is a block that applies pre-conditions before each function call.
 The syntax is as follows:
 
 ```CVL
-invariant aidInv(uint x) 
+invariant aidInv(uint x)
         exp2
 
-invariant example(address user, bytes32 id) 
+invariant example(address user, bytes32 id)
     exp
-    { 
+    {
         preserved
         {
             uint a;
@@ -158,7 +158,7 @@ invariant example(address user, bytes32 id)
     }
 ```
 
-Notice the syntax - 
+Notice the syntax -
 - The first curly brackets are used to show the bounds of the PB's declaration.
 - There can be more than one PB, so the first curly brackets are there to bound them all.
 - Curly brackets after the `preserved` keyword bound the specific preserved block.
@@ -168,9 +168,9 @@ An additional feature of the PB is the ability to define an `env` variable withi
 
 
 ```CVL
-invariant example(address user, bytes32 id) 
+invariant example(address user, bytes32 id)
     exp
-    { 
+    {
         preserved with (env e2)
         {
             ...
@@ -182,7 +182,7 @@ It is handy for the 3rd use case discussed earlier. And it is sometimes necessar
 
 Since invariants are supposed to be true regardless of anything, including `env` context, the Prover creates and uses a unique environment within the invariant context.
 
-- [ ] Look at the "Variables" box under the violation of the invariant that failed `ManagerBug3`. You can see an `invariantEnv` was created within the invariant context.
+- [x] Look at the "Variables" box under the violation of the invariant that failed `ManagerBug3`. You can see an `invariantEnv` was created within the invariant context.
 
 </br>
 
@@ -199,9 +199,9 @@ It is especially recommended to use this option over the general PB Whenever pos
 The syntax is as follows:
 
 ```CVL
-invariant example(address user, uint amount) 
+invariant example(address user, uint amount)
     exp
-    { 
+    {
         preserved getFunds(address user){
             require exp2;
         }
@@ -222,7 +222,7 @@ You can write a specific PB for each function in your system if needed. For exam
 The PB allows you to constrain method arguments too. For example:
 
 ```CVL
-invariant example(env e) 
+invariant example(env e)
     exp
     {
         preserved transfer(address recipient, uint256 amount) with (env e3) {
@@ -245,7 +245,7 @@ One can create both a general PB and function-specific PB for the same invariant
 In the example below, when the function `transfer` is being verified, the assumption `amount > 0` will apply, but `hashId == 100` will not. For the verification of any other function, it will be vice versa.
 
 ```CVL
-invariant example(bytes32 hashId, env e) 
+invariant example(bytes32 hashId, env e)
     exp
     {
         preserved with (env e2)
@@ -267,22 +267,12 @@ invariant example(bytes32 hashId, env e)
 
 </br>
 
-- [ ] Have a look at the system [ReserveList](ReserveList) and understand how it operates.
+- [x] Have a look at the system [ReserveList](ReserveList) and understand how it operates.
 
-- [ ] Try to prove the following list of properties:
+- [x] Try to prove the following list of properties:
 
-    - [ ] Both lists are correlated - If we use the id of a token in `reserves` to retrieve a token in `underlyingList`, we get the same toke.
-    
-    <details>
-    <summary>Hint:</summary>
-    If index i is nonzero and token t is a valid address then t.id equals i iff the i-th reserve is t.</br>
-    If i is zero, i-th token is t implies t.id equals i.
-    </details>
+    - [x] Both lists are correlated - If we use the id of a token in `reserves` to retrieve a token in `underlyingList`, we get the same toke.
 
-    </br>
-    
-    - [ ] There should not be a token saved at an index greater or equal to reserve counter.
-    
     <details>
     <summary>Hint:</summary>
     If index i is nonzero and token t is a valid address then t.id equals i iff the i-th reserve is t.</br>
@@ -291,8 +281,8 @@ invariant example(bytes32 hashId, env e)
 
     </br>
 
-    - [ ] Id of assets is injective (i.e. different tokens should have distinct ids).
-    
+    - [x] There should not be a token saved at an index greater or equal to reserve counter.
+
     <details>
     <summary>Hint:</summary>
     If index i is nonzero and token t is a valid address then t.id equals i iff the i-th reserve is t.</br>
@@ -300,11 +290,21 @@ invariant example(bytes32 hashId, env e)
     </details>
 
     </br>
-    
-    - [ ] Independency of tokens in list - removing one token from the list doesn't affect other tokens.
-    
-    - [ ] Each non-view function changes reservesCount by 1.
 
-- [ ] If you're able to think of additional interesting properties implement them as well. 
+    - [x] Id of assets is injective (i.e. different tokens should have distinct ids).
+
+    <details>
+    <summary>Hint:</summary>
+    If index i is nonzero and token t is a valid address then t.id equals i iff the i-th reserve is t.</br>
+    If i is zero, i-th token is t implies t.id equals i.
+    </details>
+
+    </br>
+
+    - [x] Independency of tokens in list - removing one token from the list doesn't affect other tokens.
+
+    - [x] Each non-view function changes reservesCount by 1.
+
+- [x] If you're able to think of additional interesting properties implement them as well.
 
 Upload your solutions for review by the Certora Team.
