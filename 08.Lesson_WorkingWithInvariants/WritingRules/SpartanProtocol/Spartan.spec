@@ -1,7 +1,5 @@
 methods {
     // ERC20
-    name() returns (string memory) envfree
-    symbol() returns (string memory) envfree
     decimals() returns (uint256) envfree
 	totalSupply() returns (uint256) envfree
 	balanceOf(address) returns (uint256) envfree
@@ -29,29 +27,29 @@ methods {
 // ## Rules
 // ### Valid State
 // no actual token balance => tokenSupply == 0
-// invariant noTokenBalanceThenNoLP()
-//     (getActualToken0Balance() == 0 && getActualToken1Balance() == 0) => (totalSupply() == 100000)
+invariant noTokenBalanceThenNoLP()
+    (getActualToken0Balance() == 0 && getActualToken1Balance() == 0) => (totalSupply() == 100000)
 
 
 // ### State Transitions
 // 2. (userBalanceBefore = 0 and userBalanceAfter > 0) => ((f.selector = deposit(uint256)) or (f.selector == transferFrom(address, address, uint256)) or (f.selector == transfer(address, uint256)))
 // LP token increased -> add_liquidity
-// rule lpTokenIncreased(method f) {
-//     uint256 lpBefore = totalSupply();
+rule lpTokenIncreased(method f) {
+    uint256 lpBefore = totalSupply();
 
-//     env e;
-//     calldataarg args;
-//     f(e, args);
+    env e;
+    calldataarg args;
+    f(e, args);
 
-//     uint256 lpAfter = totalSupply();
-//     assert (lpAfter > lpBefore) => (
-//         f.selector == transfer(address, uint256).selector ||
-//         f.selector == transferFrom(address, address, uint256).selector ||
-//         f.selector == add_liquidity().selector ||
-//         f.selector == swap(address).selector ||
-//         f.selector == init_pool().selector
-//     );
-// }
+    uint256 lpAfter = totalSupply();
+    assert (lpAfter > lpBefore) => (
+        f.selector == transfer(address, uint256).selector ||
+        f.selector == transferFrom(address, address, uint256).selector ||
+        f.selector == add_liquidity().selector ||
+        f.selector == swap(address).selector ||
+        f.selector == init_pool().selector
+    );
+}
 
 // ### Variable Transitions
 // 3. After every call f(env, args), totalFeesEarnedPerShareBefore <= totalFeesEarnedPerShareAfter. It's because totalFeesEarnedPerShare should be increased over time.
