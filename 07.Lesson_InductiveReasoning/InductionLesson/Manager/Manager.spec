@@ -17,13 +17,22 @@ rule uniqueManagerAsRule(uint256 fundId1, uint256 fundId2, method f) {
 	// bool active1 = isActiveManager(getCurrentManager(fundId1));
 
 	env e;
-	calldataarg args;
-	f(e,args);
+	// If `claimManagement` is called, require id be either `fundId1` or `fundId2`, to avoid the
+	// case that `claimManagement(fundId3)` affects `fundId1` or `fundId2`.
+	if (f.selector == claimManagement(uint256).selector)
+	{
+		uint256 id;
+		require id == fundId1 || id == fundId2;
+		claimManagement(e, id);
+	} else {
+		calldataarg args;
+		f(e,args);
+	}
 
 	// verify that the managers are still different
 	address manager1After = getCurrentManager(fundId1);
 	address manager2After = getCurrentManager(fundId2);
-	assert manager1After != manager2After, "managers not different";
+	assert isActiveManager(manager1After) && isActiveManager(manager2After) && manager1After != manager2After, "managers not different";
 }
 
 
