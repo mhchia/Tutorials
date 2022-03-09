@@ -14,7 +14,7 @@ rule translation_of_neverReachPlayer4(method f){
 	env e;
 	calldataarg args;
 	// https://certora.atlassian.net/wiki/spaces/CPD/pages/7340088/The+Bank
-    require ballNotAt3or4();
+    require ballAt() == 1;
     f(e, args);
     assert ballAt() != 4;
 }
