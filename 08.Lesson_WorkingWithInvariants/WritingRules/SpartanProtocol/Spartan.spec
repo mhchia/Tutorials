@@ -15,6 +15,7 @@ methods {
     getToken0Amount() returns (uint256) envfree
     getToken1Amount() returns (uint256) envfree
     getK() returns (uint256) envfree
+    getOwner() returns (address) envfree
 
     init_pool()
     add_liquidity() returns (uint256)
@@ -26,14 +27,42 @@ methods {
 
 // ## Rules
 // ### Valid State
-// no actual token balance => tokenSupply == 0
-invariant noTokenBalanceThenNoLP()
-    (getActualToken0Balance() == 0 && getActualToken1Balance() == 0) => (totalSupply() == 100000)
+definition isPoolUninitialized() returns bool = (
+    getToken0Amount() == 0 &&
+    getToken1Amount() == 0 &&
+    getK() == 0 &&
+    balanceOf(getOwner()) == 0 &&
+    totalSupply() == 0
+);
+
+definition isPoolInitialized() returns bool = (
+    getToken0Amount() > 0 &&
+    getToken1Amount() > 0 &&
+    getK() > 0 &&
+    totalSupply() > 0
+);
 
 
 // ### State Transitions
-// 2. (userBalanceBefore = 0 and userBalanceAfter > 0) => ((f.selector = deposit(uint256)) or (f.selector == transferFrom(address, address, uint256)) or (f.selector == transfer(address, uint256)))
-// LP token increased -> add_liquidity
+rule poolInit(method f) {
+    env e;
+    calldataarg args;
+    require isPoolUninitialized();
+
+    // Not interested in `sync`.
+    require f.selector != sync().selector;
+
+    f(e, args);
+
+    assert isPoolInitialized() => (
+        f.selector == init_pool().selector &&
+        e.msg.sender == getOwner()
+    );
+
+}
+
+// ### Variable Transitions
+
 rule lpTokenIncreased(method f) {
     uint256 lpBefore = totalSupply();
 
@@ -42,34 +71,51 @@ rule lpTokenIncreased(method f) {
     f(e, args);
 
     uint256 lpAfter = totalSupply();
-    assert (lpAfter > lpBefore) => (
-        f.selector == transfer(address, uint256).selector ||
-        f.selector == transferFrom(address, address, uint256).selector ||
-        f.selector == add_liquidity().selector ||
-        f.selector == swap(address).selector ||
-        f.selector == init_pool().selector
-    );
+    if (f.selector == init_pool().selector) {
+        assert lpAfter == 100000;
+    } else {
+        assert (lpAfter > lpBefore) => (
+            f.selector == transfer(address, uint256).selector ||
+            f.selector == transferFrom(address, address, uint256).selector ||
+            f.selector == add_liquidity().selector ||
+            f.selector == swap(address).selector
+        );
+    }
 }
 
-// ### Variable Transitions
-// 3. After every call f(env, args), totalFeesEarnedPerShareBefore <= totalFeesEarnedPerShareAfter. It's because totalFeesEarnedPerShare should be increased over time.
-// token0Amount and token1Amount are increased only after add_liquidity or swap
 
 // ### High-Level Properties
-invariant uvk()
-    true
 
-// balanceOf >= tokenAmount
-// - # LP tokens ==
-// token0Amount ==
-// 4. ERC20: totalSupply() = balanceOf(user) for all user in users
-// 5. assetsOf(user) shall be only non-decreasing if user hasn't transfer/transferFrom/withdraw
+invariant totalSupply_GE_single_user_balance()
+    forall address user. totalSupply() >= balanceOf(user)
 
 // ### Unit-tests
-// rule syncCan() {
 
-// }
-//
+rule add_liquidity(uint256 amount) {
+    uint256 totalBefore = totalSupply();
+    env e;
+    uint256 userBalanceBefore = balanceOf(e.msg.sender);
+
+    require userBalanceBefore >= amount;
+
+    remove_liquidity(e, amount);
+
+    assert totalSupply() == totalBefore - amount;
+    assert balanceOf(e.msg.sender) == userBalanceBefore - amount;
+}
+
+rule remove_liquidity(uint256 amount) {
+    uint256 totalBefore = totalSupply();
+    env e;
+    uint256 userBalanceBefore = balanceOf(e.msg.sender);
+    require userBalanceBefore >= amount;
+
+
+    remove_liquidity(e, amount);
+
+    assert totalSupply() == totalBefore - amount;
+    assert balanceOf(e.msg.sender) == userBalanceBefore - amount;
+}
 
 
 
