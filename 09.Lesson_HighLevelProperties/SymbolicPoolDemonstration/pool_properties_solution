@@ -1,0 +1,38 @@
+# Pool
+## Rules
+### Valid State
+- poolBalance == 0 => totalSupply == 0
+
+### State Transitions
+
+### Variable Transitions
+- balance[user] increased => f.selector == deposit.
+- balance[user] decreased => f.selector == withdraw.
+
+### High-Level Properties
+- totalSupply = sum({balance[user] | for all user in users}).
+
+### Unit Tests
+- flashLoan: poolBalance increased by `(amount*feeRate)/feePrecision`.
+- deposit
+    - deposit `amount` token and get `k <= amount` shares.
+    - `k` shares are minted.
+- withdraw: withdraw `shares` and get `k >= shares` amount of tokens.
+    - `k` shares are burnt.
+
+## Diff from `prioritiesList.md`
+### Valid State
+
+### State Transitions
+
+### Variable Transitions
+
+### High-Level Properties
+- 3. `totalSupply()` of the system is less than or equal to the `asset.balanceOf(address(this))`
+- 4. `totalSupply() == 0 <=> poolBalance == 0`
+- 6. Solvency of the system - the system has enough money to pay everyone.
+- 7. The more shares you have, the more you can withdraw (can be equal because of division)
+- 8. No frontrunning - one user’s action should not affect another user’s action.
+
+
+### Unit Tests
