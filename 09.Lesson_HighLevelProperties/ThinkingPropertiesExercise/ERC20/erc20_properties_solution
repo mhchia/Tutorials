@@ -1,0 +1,28 @@
+# Meeting
+## Rules
+### Valid State
+
+### State Transitions
+
+### Variable Transitions
+- 1. allowance increased -> approve, increaseAllowance
+- 2. allowance decreased -> approve, decreaseAllowance, transferFrom
+
+### High-Level Properties
+- 3. totalSupply >= user balance
+- 4. transfer, transferFrom: balanceToBefore + balanceFromBefore == balanceToAfter + balanceFromAfter
+
+### Unit Tests
+- 5. transfer
+- 6. approve
+
+## Priority
+### High
+- 3 is high because it guarantees total supply is correct.
+- 4 is correct because it guarantees balances is not messed up after transfer.
+
+### Medium
+- 1, 2 are medium because they are straight forward and less possible to have bugs.
+
+### Low
+- 5, 6 are low because they can be done by other approaches.

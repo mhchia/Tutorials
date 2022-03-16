@@ -1,0 +1,31 @@
+# Meeting
+## Rules
+### Valid State
+
+states
+- uninitialized (total = 0, k = 0)
+- initialized (after `init_pool` is called and `K != 0`)
+
+Rules
+- 1. uninitialized -> initialized => `init_pool` is called.
+
+### Variable Transitions
+- 2. lp token increased => method add_liquidity/init_pool are called.
+- 3. lp token decreased => method remove_liquidity is called.
+
+### High-Level Properties
+- 4. for all user balance, user balance <= total supply.
+
+### Unit Tests
+- 5. add liquidity
+- 6. remove liquidity
+- 7. swap
+
+## Priority
+### High
+- 1 is high priority because the system parameter `K` is calculated and LP tokens are minted. There should be only one way to make this initial change otherwise the system behavior might be undesired.
+- 2, 3 are high priority since if they are violated, total supply of LP token might be changed incorrectly and make users lose their funds.
+- 4 is high priority since if it is violated the accounting is broken.
+
+### Low
+- 5, 6, 7 are low priority since they can be tested in other ways.

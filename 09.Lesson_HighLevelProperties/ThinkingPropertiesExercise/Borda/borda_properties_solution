@@ -1,0 +1,48 @@
+# Meeting
+## Rules
+### Valid State
+
+voter states
+- non-voter
+- registered
+    - can vote once
+- voted
+- warned
+- blacklisted
+
+contender states
+- non-contender
+- registered
+
+
+Rules
+- 1. non-contender -> couldn't be voted
+- 2. blacklisted -> cannot vote
+
+### State Transitions
+- 3. non-voter -> registered => register
+- 4. registered -> warned => vote
+- 5. warned -> blacklisted => vote
+
+### Variable Transitions
+- 6. points increased => vote
+
+### High-Level Properties
+- 7. points can only be increased
+- 8. voted cannot be changed to not-voted
+- 9. winner is the one with most points
+- 10. winner points must be equaled to contender[winner].points
+
+### Unit Tests
+- 11. register voter
+- 12. vote
+
+## Priority
+### High
+- 1, 2 are high priority since it promises users can act only in a valid state.
+- 3, 4, 5 are high priority since the state of a voter transits in the intended way.
+- 6 is high priority since there shall be no way for points to be increased other than `vote`.
+- 7, 8, 9, 10 are high priority since these are  general invariant that the system must follow.
+
+### Low
+- 11, 12 are low because they can be done by other approaches.
